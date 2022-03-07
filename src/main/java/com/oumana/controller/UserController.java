@@ -34,7 +34,9 @@ public class UserController {
 	
 	@PostMapping
 	public ResponseEntity<User> createUser(@RequestBody User user) {
+	
 		URI uRI = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/users").toUriString());
 		return ResponseEntity.created(uRI).body(userService.createUser(user));
 	}
+	
 }
