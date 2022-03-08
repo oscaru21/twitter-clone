@@ -9,9 +9,9 @@
 |-----------------|------------------------------------------------|------------------------------|
 | GET             | /users                                         | Get all users                |
 | GET             | /users/{username}                              | Get user by username         |
-| GET             | /users                                         | Create new user              |
-| POST            | /users/{id}                                    | Update user data             |
-| PUT             | /users/{id}                                    | Delete user by id            |
+| POST            | /users                                         | Create new user              |
+| PUT             | /users                                         | Update user data             |
+| DELETE          | /users/{id}                                    | Delete user by id            |
 | GET             | /users?pageSize=10&pageNo=1&sortingBy=username | Pagination and sorting users |
 
 ## Tweet API design

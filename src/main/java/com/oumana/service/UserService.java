@@ -1,13 +1,12 @@
 package com.oumana.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.oumana.entity.User;
+import com.oumana.payload.UserResponse;
 
 public interface UserService {
 	User getUserByUsername(String username);
-	List<User> getUsers();
+	UserResponse getUsers(Integer pageNo, Integer pageSize);
 	User createUser(User user);
+	User updateUser(User user);
+	void deleteUser(Long id);
 }
