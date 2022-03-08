@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,6 +22,7 @@ import lombok.Data;
 @Entity
 @Data
 @JsonIgnoreProperties({"user"})
+@Table(name = "tweets")
 public class Tweet {
 	@Id
 	@Column(nullable = false)
