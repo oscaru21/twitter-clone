@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +42,7 @@ public class TweetController {
 			@PathVariable(name = "username") String username){
 		return ResponseEntity.ok().body(tweetService.getTweetsByUsername(username));
 	}
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/{username}/tweets")
 	public ResponseEntity<Tweet> createTweet(
 			@PathVariable(name = "username") String username,
@@ -49,7 +50,7 @@ public class TweetController {
 		URI uRI = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/users/" + username + "/tweets").toUriString());
 		return ResponseEntity.created(uRI).body(tweetService.createTweet(username, tweet));
 	}
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{username}/tweets/{id}")
 	public ResponseEntity<Tweet> updateTweet(
 			@PathVariable(name = "username") String username,
@@ -57,7 +58,7 @@ public class TweetController {
 			@RequestBody Tweet tweet){
 		return ResponseEntity.ok().body(tweetService.updateTweet(username, id, tweet));
 	}
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{username}/tweets/{id}")
 	public void deleteTweet(
 			@PathVariable Long id,
