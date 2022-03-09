@@ -30,3 +30,16 @@
 |-----------------|-------------------------------------|-----------------|
 | POST            | /users/{username}/tweets/{id}/likes | Create new like |
 | DELETE          | /users/{username}/tweets/{id}/likes | Delete like     |
+
+## Authentication API design
+
+| **HTTP Method** | **Path**     | **Description** |
+|-----------------|--------------|-----------------|
+| POST            | /auth/login  | login           |
+| POST            | /auth/signup | signup          |
+
+## JWT configuration with spring security
+
+- To customize Spring Security, we need a config class annotated with @EnableWebSecurity. That extends the WebSecurityConfigurerAdapter class and override both of its functions to customize the http security and authentication manager.
+- In this class we will include our UserRepo class as a dependency in order to get the user information from our database.
+- 
