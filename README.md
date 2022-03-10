@@ -1,15 +1,13 @@
 # twitter-clone
 
 ## Class Diagram
-![](./img/twitterClone.drawio.png)
+![](./img/twitterClone.png)
 
 ## Users API design
 
 | **HTTP Method** | **Path**                                       | **Description**              |
 |-----------------|------------------------------------------------|------------------------------|
-| GET             | /users                                         | Get all users                |
 | GET             | /users/{username}                              | Get user by username         |
-| POST            | /users                                         | Create new user              |
 | PUT             | /users                                         | Update user data             |
 | DELETE          | /users/{id}                                    | Delete user by id            |
 | GET             | /users?pageSize=10&pageNo=1&sortingBy=username | Pagination and sorting users |
