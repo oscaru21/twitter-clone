@@ -1,19 +1,15 @@
 package com.oumana.controller;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.oumana.entity.User;
 import com.oumana.payload.UserResponse;
@@ -38,13 +34,6 @@ public class UserController {
 	@GetMapping("/{username}")
 	public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
 		return ResponseEntity.ok().body(userService.getUserByUsername(username));
-	}
-	
-	@PostMapping
-	public ResponseEntity<User> createUser(@RequestBody User user) {
-	
-		URI uRI = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/users").toUriString());
-		return ResponseEntity.created(uRI).body(userService.createUser(user));
 	}
 	
 	@PutMapping

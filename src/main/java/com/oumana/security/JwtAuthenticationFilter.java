@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.oumana.repository.UserRepo;
 
-@Component
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired

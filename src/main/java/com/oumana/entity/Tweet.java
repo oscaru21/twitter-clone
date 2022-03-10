@@ -1,7 +1,7 @@
 package com.oumana.entity;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,5 +38,5 @@ public class Tweet {
 	private User user;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "tweet")
-	private List<Heart> hearts;
+	private Set<Heart> hearts;
 }

@@ -32,7 +32,6 @@ import lombok.Data;
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"username", "email"}))
 public class User implements UserDetails{
    
-	
 	@Id
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,10 +48,10 @@ public class User implements UserDetails{
     private String email;
     
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private List<Tweet> tweets;
+    private Set<Tweet> tweets;
     
     @OneToMany(mappedBy = "user")
-    private List<Heart> hearts;
+    private Set<Heart> hearts;
     
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", 

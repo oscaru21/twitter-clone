@@ -2,6 +2,7 @@ package com.oumana.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +39,7 @@ public class TweetServiceImpl implements TweetService{
 	}
 
 	@Override
-	public List<Tweet> getTweetsByUsername(String username) {
+	public Set<Tweet> getTweetsByUsername(String username) {
 		User user = userService.getUserByUsername(username);
 		return user.getTweets();
 	}

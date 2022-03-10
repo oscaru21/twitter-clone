@@ -1,5 +1,6 @@
 package com.oumana.controller;
 
+import java.net.http.HttpHeaders;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oumana.entity.Role;
 import com.oumana.entity.User;
+import com.oumana.payload.JwtAuthResponse;
 import com.oumana.payload.LoginDto;
 import com.oumana.payload.SignUpDto;
 import com.oumana.repository.RoleRepo;
 import com.oumana.repository.UserRepo;
+import com.oumana.security.JwtTokenProvider;
 
 @RestController
 @RequestMapping("/auth")
@@ -36,6 +39,9 @@ public class AuthController {
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	JwtTokenProvider jwtTokenProvider;
 
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
@@ -43,7 +49,10 @@ public class AuthController {
 				loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		return new ResponseEntity<String>("User logged successfully", HttpStatus.OK);
+		
+		//get a token from the provider
+		String token = jwtTokenProvider.generateToken(authentication);
+		return ResponseEntity.ok().header("Authorization", token).body("User logged successfully");
 	}
 	
 	@PostMapping("/signup")

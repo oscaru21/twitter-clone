@@ -8,9 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.oumana.exceptions.APIException;
+
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 public class JwtTokenProvider {
@@ -46,11 +52,18 @@ public class JwtTokenProvider {
 	//validate jwt token
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        } catch (SignatureException ex) {
+            throw new APIException("Invalid JWT signature - {}", ex.getMessage());
+        } catch (MalformedJwtException ex) {
+        	throw new APIException("Invalid JWT token - {}", ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+        	throw new APIException("Expired JWT token - {}", ex.getMessage());
+        } catch (UnsupportedJwtException ex) {
+        	throw new APIException("Unsupported JWT token - {}", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+        	throw new APIException("JWT claims string is empty - {}", ex.getMessage());
+        }
 	}
 }

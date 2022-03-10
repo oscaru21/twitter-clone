@@ -1,7 +1,7 @@
 package com.oumana.controller;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ public class TweetController {
 	}
 	
 	@GetMapping("/{username}/tweets")
-	public ResponseEntity<List<Tweet>> getTweetsByUsername(
+	public ResponseEntity<Set<Tweet>> getTweetsByUsername(
 			@PathVariable(name = "username") String username){
 		return ResponseEntity.ok().body(tweetService.getTweetsByUsername(username));
 	}
