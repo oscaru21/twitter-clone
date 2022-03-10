@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.oumana.repository.UserRepo;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -23,23 +25,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	JwtTokenProvider jwtTokenProvider;
 
 	@Autowired
-	CustomUserDetailService customUserDetailService;
+	UserRepo userRepo;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// get JWT token from the http request headers
+		// get JWT token from the http Authorization header
 		String token = getJWTFromRequestString(request);
 
 		// validate token
 		if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-			// get username from token
-			String username = jwtTokenProvider.getUsernameFromJwt(token);
 			// load user associated with the token
-			UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
+			UserDetails userDetails = userRepo
+					.findByUsername(jwtTokenProvider.getUsernameFromJwt(token))
+					.orElse(null);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 					userDetails, null, userDetails.getAuthorities());
+			
 			authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 			
 			// set spring security

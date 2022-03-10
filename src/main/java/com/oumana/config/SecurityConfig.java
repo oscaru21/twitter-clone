@@ -5,87 +5,98 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
-import com.oumana.security.CustomUserDetailService;
+import com.oumana.repository.UserRepo;
 import com.oumana.security.JwtAuthenticationEntryPoint;
 import com.oumana.security.JwtAuthenticationFilter;
 
-
 @EnableWebSecurity
-public class SecurityConfig{
-	
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
 	@Autowired
-	private CustomUserDetailService userDetailsService;
-	
+	UserRepo userRepo;
+
 	@Autowired
 	JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-	
+
 	@Bean
 	JwtAuthenticationFilter jwtAuthenticationFilter() {
 		return new JwtAuthenticationFilter();
 	}
-	
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Configuration
-	@EnableGlobalMethodSecurity(prePostEnabled = true)
-	public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
-
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable()
-			.exceptionHandling()
-			.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-			.and()
-			.sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.authorizeRequests()
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		//enable CORS and disable CSRF
+		http.cors().and().csrf().disable();
+		
+		// Set session management to stateless
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
+		
+		//Set unathorized request exception handler
+		http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+		
+		//Set permissions to endpoints
+		http.authorizeRequests()
 			.antMatchers(HttpMethod.GET, "/**").permitAll()
+			//h2 console access
 			.antMatchers("/h2-console/**").permitAll()
+			//login and signup endpoints
 			.antMatchers("/auth/**").permitAll()
 			.anyRequest().authenticated();
-			
-			http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-			http.headers().frameOptions().disable();
-			
-		}
+
+		//Add Jwt token filter
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		
-		@Override
-		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-		}
-		
-		@Override
-		@Bean
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
+		//h2 configuration
+		http.headers().frameOptions().disable();
+
 	}
-//	//In memory authentication
-//	@Bean
-//	public UserDetailsService userDetailsService() {
-//		UserDetails admin = User.builder().username("admin").password(passwordEncoder().encode("admin")).roles("ADMIN")
-//				.build();
-//		UserDetails oscar = User.builder().username("oscar").password(passwordEncoder().encode("passwordd"))
-//				.roles("USER").build();
-//		return new InMemoryUserDetailsManager(oscar, admin);
-//	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(usernameOrEmail -> userRepo.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+				.orElseThrow(() -> new UsernameNotFoundException(
+						"User not find with username or email: " + usernameOrEmail)))
+				.passwordEncoder(passwordEncoder());
+	}
+
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	// Used by spring security if CORS is enabled.
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+	
 }
